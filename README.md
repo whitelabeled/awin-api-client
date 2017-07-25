@@ -17,6 +17,6 @@ $client = new \whitelabeled\AwinApi\AwinClient('authtoken', 'publusherid');
 
 ## License
 
-© Whitelabeled BV
+© Vergelijkgroep BV
 
 MIT license, see [LICENSE.txt](LICENSE.txt) for details.
