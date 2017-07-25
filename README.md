@@ -1,8 +1,8 @@
 # Awin API client
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/whitelabeled/daisycon-api-client.svg)](https://packagist.org/packages/whitelabeled/daisycon-api-client)
-[![Total Downloads](https://img.shields.io/packagist/dt/whitelabeled/daisycon-api-client.svg)](https://packagist.org/packages/whitelabeled/daisycon-api-client)
-[![License](https://img.shields.io/packagist/l/whitelabeled/daisycon-api-client.svg)](https://packagist.org/packages/whitelabeled/daisycon-api-client)
+[![Latest Stable Version](https://img.shields.io/packagist/v/whitelabeled/awin-api-client.svg)](https://packagist.org/packages/whitelabeled/awin-api-client)
+[![Total Downloads](https://img.shields.io/packagist/dt/whitelabeled/awin-api-client.svg)](https://packagist.org/packages/whitelabeled/awin-api-client)
+[![License](https://img.shields.io/packagist/l/whitelabeled/awin-api-client.svg)](https://packagist.org/packages/whitelabeled/awin-api-client)
 
 Library to retrieve sales from the Awin publisher API.
 
