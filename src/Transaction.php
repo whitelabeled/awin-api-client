@@ -113,7 +113,7 @@ class Transaction {
         $transaction->transactionDevice = $transData->transactionDevice;
         $transaction->commissionStatus = $transData->commissionStatus;
         $transaction->declineReason = $transData->declineReason;
-        $transaction->clickRefs = $transData->clickRefs;
+        $transaction->clickRefs = (array) $transData->clickRefs;
         $transaction->commissionAmount = $transData->commissionAmount->amount;
         $transaction->orderReference = $transData->orderRef;
         $transaction->saleAmount = $transData->saleAmount->amount;

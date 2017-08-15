@@ -12,7 +12,7 @@ Usage:
 <?php
 require 'vendor/autoload.php';
 
-$client = new \whitelabeled\AwinApi\AwinClient('authtoken', 'publusherid');
+$client = new \whitelabeled\AwinApi\AwinClient('authtoken', 'publisherid');
 ``` 
 
 ## License
