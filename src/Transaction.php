@@ -97,6 +97,16 @@ class Transaction {
     public $transactionType;
 
     /**
+     * @var integer
+     */
+    public $commissionGroupID;
+
+    /**
+     * @var CommissionGroup|null
+     */
+    public $commissionGroup;
+
+    /**
      * Create a Transaction object from two JSON objects
      * @param $transData \stdClass Transaction data
      * @return Transaction
@@ -113,7 +123,7 @@ class Transaction {
         $transaction->transactionDevice = $transData->transactionDevice;
         $transaction->commissionStatus = $transData->commissionStatus;
         $transaction->declineReason = $transData->declineReason;
-        $transaction->clickRefs = (array) $transData->clickRefs;
+        $transaction->clickRefs = (array)$transData->clickRefs;
         $transaction->commissionAmount = $transData->commissionAmount->amount;
         $transaction->orderReference = $transData->orderRef;
         $transaction->saleAmount = $transData->saleAmount->amount;

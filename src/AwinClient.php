@@ -6,17 +6,40 @@ use DateTime;
 use Httpful\Request;
 
 class AwinClient {
+    /**
+     * @var boolean Whether to request commission groups
+     */
+    public $requestCG = false;
+
+    /**
+     * @var string
+     */
     private $authToken;
+
+    /**
+     * @var integer
+     */
     private $publisherId;
 
-
+    /**
+     * @var string Endpoint for Awin API
+     */
     protected $endpoint = 'https://api.awin.com';
+
+    /**
+     * @var integer Max transactions per request
+     */
     protected $itemsPerPage = 200;
 
     /**
+     * @var CommissionGroup[] Commission groups
+     */
+    protected $commissionGroups = [];
+
+    /**
      * DaisyconClient constructor.
-     * @param $authToken      string Awin auth token
-     * @param $publisherId    string Awin Publisher ID
+     * @param $authToken   string Awin auth token
+     * @param $publisherId integer Awin Publisher ID
      */
     public function __construct($authToken, $publisherId) {
         $this->authToken = $authToken;
@@ -47,11 +70,44 @@ class AwinClient {
         if ($transactionsData != null) {
             foreach ($transactionsData as $transactionData) {
                 $transaction = Transaction::createFromJson($transactionData);
+
+                if ($this->requestCG == true) {
+                    // Search appropriate commission group for this transaction
+                    $transaction->commissionGroup = $this->findCommissionGroup($transaction->commissionGroupID);
+                }
+
                 $transactions[] = $transaction;
             }
         }
 
         return $transactions;
+    }
+
+
+    /**
+     * @param $advertiserId integer Advertiser ID
+     * @return CommissionGroup[]
+     */
+    public function getCommissionGroups($advertiserId) {
+        $params = [
+            'advertiserId' => $advertiserId,
+        ];
+
+        $query = '?' . http_build_query($params);
+        $response = $this->makeRequest("/publishers/{$this->publisherId}/commissiongroups/", $query);
+
+        $commissionGroups = [];
+        $cgData = $response->body;
+
+        if ($cgData != null) {
+            foreach ($cgData->commissionGroups as $commissionGroupData) {
+                $commissionGroup = CommissionGroup::createFromJson((array)$commissionGroupData, $cgData->advertiser);
+
+                $commissionGroups[] = $commissionGroup;
+            }
+        }
+
+        return $commissionGroups;
     }
 
     protected function makeRequest($resource, $query = "") {
@@ -66,12 +122,40 @@ class AwinClient {
         // Check for errors
         if ($response->hasErrors()) {
             if (isset($response->body->description)) {
-                throw new \Exception('API Error: '.$response->body->description);
+                throw new \Exception('API Error: ' . $response->body->description);
             } else {
                 throw new \Exception('Invalid data');
             }
         }
 
         return $response;
+    }
+
+    /**
+     * @param $commissionGroupID integer
+     * @param $advertiserId      integer
+     * @return null|CommissionGroup
+     */
+    private function findCommissionGroup($commissionGroupID, $advertiserId) {
+        if (empty($commissionGroupID)) {
+            return null;
+        }
+
+        if (isset($this->commissionGroups[$commissionGroupID])) {
+            return $this->commissionGroups[$commissionGroupID];
+        }
+
+        // Request commission groups:
+        $commissionGroups = $this->getCommissionGroups($advertiserId);
+
+        foreach ($commissionGroups as $commissionGroup) {
+            $this->commissionGroups[$commissionGroup->id] = $commissionGroup;
+        }
+
+        if (isset($this->commissionGroups[$commissionGroupID])) {
+            return $this->commissionGroups[$commissionGroupID];
+        } else {
+            return null;
+        }
     }
 }
