@@ -57,9 +57,24 @@ class Transaction {
     public $clickRefs;
 
     /**
-     * @var double
+     * @var double Effective commission for this sale
      */
     public $commissionAmount;
+
+    /**
+     * @var double Total commission for this sale
+     */
+    public $totalCommissionAmount;
+
+    /**
+     * @var boolean Whether the commission for this sale is shared with a service provider
+     */
+    public $sharedCommission;
+
+    /**
+     * @var double Percentage of the total sale commission
+     */
+    public $commissionPercentage;
 
     /**
      * @var string
@@ -87,24 +102,14 @@ class Transaction {
     public $paid;
 
     /**
-     * @var array
+     * @var TransactionPart[]
      */
-    public $transactionParts;
+    public $transactionParts = [];
 
     /**
      * @var string
      */
     public $transactionType;
-
-    /**
-     * @var integer
-     */
-    public $commissionGroupID;
-
-    /**
-     * @var CommissionGroup|null
-     */
-    public $commissionGroup;
 
     /**
      * Create a Transaction object from two JSON objects
@@ -130,8 +135,33 @@ class Transaction {
         $transaction->siteName = $transData->siteName;
         $transaction->url = $transData->publisherUrl;
         $transaction->paid = $transData->paidToPublisher;
-        $transaction->transactionParts = $transData->transactionParts;
         $transaction->transactionType = $transData->type;
+
+        $transaction->totalCommissionAmount = 0;
+
+        // Process transaction parts:
+        foreach ($transData->transactionParts as $transactionPartData) {
+            $transactionPart = new TransactionPart();
+
+            $transactionPart->commissionGroupId = $transactionPartData->commissionGroupId;
+            $transactionPart->amount = $transactionPartData->amount;
+            $transactionPart->commissionAmount = $transactionPartData->commissionAmount;
+
+            // Add transaction part
+            $transaction->transactionParts[] = $transactionPart;
+
+            // Keep track of total commission (over all transaction parts)
+            $transaction->totalCommissionAmount += $transactionPart->commissionAmount;
+        }
+
+        // Determine whether the commission for this sale is shared with other publisher:
+        if ($transaction->totalCommissionAmount != $transaction->commissionAmount) {
+            $transaction->sharedCommission = true;
+            $transaction->commissionPercentage = $transaction->commissionAmount / $transaction->totalCommissionAmount * 100;
+        } else {
+            $transaction->sharedCommission = false;
+            $transaction->commissionPercentage = 100;
+        }
 
         return $transaction;
     }
