@@ -155,7 +155,7 @@ class Transaction {
         }
 
         // Determine whether the commission for this sale is shared with other publisher:
-        if ($transaction->totalCommissionAmount != $transaction->commissionAmount) {
+        if ($transaction->totalCommissionAmount > 0 && $transaction->totalCommissionAmount != $transaction->commissionAmount) {
             $transaction->sharedCommission = true;
             $transaction->commissionPercentage = $transaction->commissionAmount / $transaction->totalCommissionAmount * 100;
         } else {
