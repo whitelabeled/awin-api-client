@@ -9,7 +9,7 @@ class AwinClient {
     /**
      * @var boolean Whether to request commission groups
      */
-    public $requestCG = false;
+    public $verboseCommissionGroups = false;
 
     /**
      * @var string
@@ -71,9 +71,11 @@ class AwinClient {
             foreach ($transactionsData as $transactionData) {
                 $transaction = Transaction::createFromJson($transactionData);
 
-                if ($this->requestCG == true) {
-                    // Search appropriate commission group for this transaction
-                    $transaction->commissionGroup = $this->findCommissionGroup($transaction->commissionGroupID);
+                if ($this->verboseCommissionGroups == true) {
+                    // Search commission groups for this transaction
+                    foreach ($transaction->transactionParts as $transactionPart) {
+                        $transactionPart->commissionGroup = $this->findCommissionGroup($transactionPart->commissionGroupId, $transaction->advertiserId);
+                    }
                 }
 
                 $transactions[] = $transaction;
